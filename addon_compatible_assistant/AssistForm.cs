@@ -125,9 +125,17 @@ namespace addon_compatible_assistant
                 }
             }
 
+            // 遍历修改文件
             foreach (FileInfo file in files)
             {
-                EditFile(file);
+                if (file.Name.ToLower() == "libaddonmenu-2.0.lua")
+                {
+                    EditLAM(file);
+                }
+                else
+                {
+                    EditFile(file);
+                }
             }
 
             MessageBox.Show("修改完成。");
@@ -149,6 +157,71 @@ namespace addon_compatible_assistant
             foreach (var item in replaceDict)
             {
                 text = text.Replace(item.Key, item.Value);
+            }
+
+            // write
+            StreamWriter sw = new StreamWriter(file.FullName);
+            sw.Write(text);
+            sw.Close();
+        }
+
+        // 修改 LibAddonMenu 文件
+        private void EditLAM(FileInfo file)
+        {
+            // read
+            StreamReader sr = new StreamReader(file.FullName);
+            string text = sr.ReadToEnd();
+            sr.Close();
+
+            // edit
+            string pattern1 = @"
+                local\ controlPanelNames\ =
+                [^{}]*                  # any non brace stuff.
+                \{(                     # First '{' + capturing bracket
+                    (?:
+                    [^{}]               # Match all non-braces
+                    |
+                    (?<open> \{ )       # Match '{', and capture into 'open'
+                    |
+                    (?<-open> \} )      # Match '}', and delete the 'open' capture
+                    )+                  # Change to * if you want to allow {}
+                    (?(open)(?!))       # Fails if 'open' stack isn't empty!
+                )\}                     # Last
+            ";
+            string pattern2 = @"
+                local\ localization\ =
+                [^{}]*                  # any non brace stuff.
+                \{(                     # First '{' + capturing bracket
+                    (?:
+                    [^{}]               # Match all non-braces
+                    |
+                    (?<open> \{ )       # Match '{', and capture into 'open'
+                    |
+                    (?<-open> \} )      # Match '}', and delete the 'open' capture
+                    )+                  # Change to * if you want to allow {}
+                    (?(open)(?!))       # Fails if 'open' stack isn't empty!
+                )\}                     # Last '}' + close capturing bracket
+            ";
+
+            string matched = Regex.Match(text, pattern1, RegexOptions.IgnorePatternWhitespace).Value;
+            if (matched != "" && !matched.Contains("zh = "))
+            {
+                // 情况1
+                matched = matched.Replace("local controlPanelNames = {", "local controlPanelNames = {\n\t\tzh = \"插件设置\",");
+                text = Regex.Replace(text, pattern1, matched, RegexOptions.IgnorePatternWhitespace);
+            }
+            else
+            {
+                matched = Regex.Match(text, pattern2, RegexOptions.IgnorePatternWhitespace).Value;
+                if (matched != "" && !matched.Contains("zh = "))
+                {
+                    // 情况2
+                    string zhText = "    zh = {\n        PANEL_NAME = \"插件\",\n" +
+                            "        VERSION = \"版本: <<X:1>>\",\n        WEBSITE = \"访问网站\",\n" +
+                            "        PANEL_INFO_FONT = \"EsoZh/fonts/univers57.otf|14|soft-shadow-thin\",\n    },";
+                    matched = matched.Replace("local localization = {", "local localization = {\n" + zhText);
+                    text = Regex.Replace(text, pattern2, matched, RegexOptions.IgnorePatternWhitespace);
+                }
             }
 
             // write
