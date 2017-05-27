@@ -6,6 +6,7 @@ using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
@@ -14,8 +15,8 @@ namespace addon_compatible_assistant
     public partial class AssistForm : Form
     {
         // 要自动替换的内容
-        private Dictionary<string, string> replaceList;
-        private Dictionary<string, string> replaceListIgnoreCase;
+        private Dictionary<string, string> replaceDict;
+        private Dictionary<string, string> replaceDictIgnoreCase;
         // 要处理的目录列表
         private List<DirectoryInfo> dirList = new List<DirectoryInfo>();
 
@@ -23,17 +24,14 @@ namespace addon_compatible_assistant
         {
             InitializeComponent();
 
-            listViewDir.HeaderStyle = ColumnHeaderStyle.None;
-
             InitializeParams();
-            CheckDirectory();
         }
 
         // 初始化替换列表等
         private void InitializeParams()
         {
             // 考虑大小写的替换表
-            replaceList = new Dictionary<string, string>()
+            replaceDict = new Dictionary<string, string>()
             {
                 { "$(MEDIUM_FONT)", "EsoZH/fonts/univers57.otf" },
                 { "$(BOLD_FONT)", "EsoZH/fonts/univers67.otf" },
@@ -57,7 +55,7 @@ namespace addon_compatible_assistant
             };
 
             // 忽略大小写的替换表
-            replaceListIgnoreCase = new Dictionary<string, string>()
+            replaceDictIgnoreCase = new Dictionary<string, string>()
             {
                 { "EsoUI/Common/Fonts/", "EsoZH/fonts/" },
             };
@@ -67,8 +65,14 @@ namespace addon_compatible_assistant
         private void CheckDirectory()
         {
             DirectoryInfo dir = new DirectoryInfo(Directory.GetCurrentDirectory());
+
+            if (dir.Name.ToLower() != "addons")
+            {
+                MessageBox.Show("请把本程序复制到 AddOns 下运行。");
+            }
+
             listViewDir.Clear();
-            listViewDir.Columns.Add("", listViewDir.Width - 50);
+            listViewDir.Columns.Add("插件", listViewDir.Width - 50);
             dirList.Clear();
 
             // 遍历，排除汉化插件的目录
@@ -80,6 +84,68 @@ namespace addon_compatible_assistant
                     listViewDir.Items.Add(subDir.Name);
                 }
             }
+        }
+
+        // 修改插件文本
+        private void EditAddons()
+        {
+            List<FileInfo> files = new List<FileInfo>();    // 待修改的文件列表
+
+            // 遍历寻找文件
+            foreach (DirectoryInfo addonDir in dirList)
+            {
+                foreach (FileInfo info in addonDir.EnumerateFiles("*.*", SearchOption.AllDirectories))
+                {
+                    if (info.Name.ToLower().EndsWith(".lua") || info.Name.ToLower().EndsWith(".xml"))
+                    {
+                        files.Add(info);
+                    }
+                }
+            }
+
+            foreach (FileInfo file in files)
+            {
+                EditFile(file);
+            }
+
+            MessageBox.Show("修改完成。");
+        }
+
+        // 修改一个文件
+        private void EditFile(FileInfo file)
+        {
+            // read
+            StreamReader sr = new StreamReader(file.FullName);
+            string text = sr.ReadToEnd();
+            sr.Close();
+
+            // edit
+            foreach (var item in replaceDict)
+            {
+                text = text.Replace(item.Key, item.Value);
+            }
+            foreach (var item in replaceDictIgnoreCase)
+            {
+                text = Regex.Replace(text, item.Key, item.Value, RegexOptions.IgnoreCase);
+            }
+
+            // write
+            StreamWriter sw = new StreamWriter(file.FullName);
+            sw.Write(text);
+            sw.Close();
+        }
+
+        // 显示窗口时
+        private void AssistForm_Shown(object sender, EventArgs e)
+        {
+            CheckDirectory();
+        }
+
+        // 点击修改按钮时
+        private void buttonEdit_Click(object sender, EventArgs e)
+        {
+            buttonEdit.Enabled = false;
+            EditAddons();
         }
     }
 }

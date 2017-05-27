@@ -43,7 +43,7 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.listViewDir.Location = new System.Drawing.Point(12, 66);
             this.listViewDir.Name = "listViewDir";
-            this.listViewDir.Size = new System.Drawing.Size(260, 268);
+            this.listViewDir.Size = new System.Drawing.Size(260, 283);
             this.listViewDir.TabIndex = 0;
             this.listViewDir.UseCompatibleStateImageBehavior = false;
             this.listViewDir.View = System.Windows.Forms.View.Details;
@@ -79,6 +79,7 @@
             this.buttonEdit.TabIndex = 4;
             this.buttonEdit.Text = "修改(&E)";
             this.buttonEdit.UseVisualStyleBackColor = true;
+            this.buttonEdit.Click += new System.EventHandler(this.buttonEdit_Click);
             // 
             // labelListViewName
             // 
@@ -102,6 +103,7 @@
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "AssistForm";
             this.Text = "插件兼容修改助手";
+            this.Shown += new System.EventHandler(this.AssistForm_Shown);
             this.ResumeLayout(false);
             this.PerformLayout();
 
