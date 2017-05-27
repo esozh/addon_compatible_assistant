@@ -57,7 +57,29 @@ namespace addon_compatible_assistant
             // 忽略大小写的替换表
             replaceDictIgnoreCase = new Dictionary<string, string>()
             {
+                { "esoui/common/fonts/eso_fwudc_70-m.ttf", "EsoZH/fonts/univers57.otf" },
+                { "esoui/common/fonts/eso_fwntlgudc70-db.ttf", "EsoZH/fonts/univers57.otf" },
                 { "EsoUI/Common/Fonts/", "EsoZH/fonts/" },
+
+                { "AUI/fonts/Kingthings_Calligraphica_2.ttf", "EsoZH/fonts/univers57.otf" },
+                { "AUI/fonts/Almendra-Bold.otf", "EsoZH/fonts/univers67.otf" },
+                { "AUI/fonts/SansitaOne.ttf", "EsoZH/fonts/univers67.otf" },
+                { "AUI/fonts/Bellota-Bold.otf", "EsoZH/fonts/univers57.otf" },
+                { @"\[\[CombatCloud/Media/Fonts/[A-Za-z\-_]*\.[ot]?tf\]\]", "[[EsoZH/fonts/univers57.otf]]" },
+                { "FoundryTacticalCombat/lib/fonts/Metamorphous.otf", "EsoZH/fonts/univers57.otf" },
+                { "MasterMerchant/Fonts/arialn.ttf", "EsoZH/fonts/univers57.otf" },
+                { "MasterMerchant/Fonts/esocartographer-bold.otf", "EsoZH/fonts/univers67.otf" },
+                { "MasterMerchant/Fonts/fontin_sans_b.otf", "EsoZH/fonts/univers67.otf" },
+                { "MasterMerchant/Fonts/fontin_sans_i.otf", "EsoZH/fonts/univers57.otf" },
+                { "MasterMerchant/Fonts/fontin_sans_r.otf", "EsoZH/fonts/univers57.otf" },
+                { "MasterMerchant/Fonts/fontin_sans_sc.otf", "EsoZH/fonts/univers57.otf" },
+                { "MiniMap/Fonts/arialn.ttf", "EsoZH/fonts/univers57.otf" },
+                { "MiniMap/Fonts/consola.ttf", "EsoZH/fonts/univers57.otf" },
+                { "MiniMap/Fonts/esocartographer-bold.otf", "EsoZH/fonts/univers67.otf" },
+                { "MiniMap/Fonts/fontin_sans_b.otf", "EsoZH/fonts/univers67.otf" },
+                { "MiniMap/Fonts/fontin_sans_i.otf", "EsoZH/fonts/univers57.otf" },
+                { "MiniMap/Fonts/fontin_sans_r.otf", "EsoZH/fonts/univers57.otf" },
+                { "MiniMap/Fonts/fontin_sans_sc.otf", "EsoZH/fonts/univers57.otf" },
             };
         }
 
@@ -120,13 +142,13 @@ namespace addon_compatible_assistant
             sr.Close();
 
             // edit
-            foreach (var item in replaceDict)
-            {
-                text = text.Replace(item.Key, item.Value);
-            }
             foreach (var item in replaceDictIgnoreCase)
             {
                 text = Regex.Replace(text, item.Key, item.Value, RegexOptions.IgnoreCase);
+            }
+            foreach (var item in replaceDict)
+            {
+                text = text.Replace(item.Key, item.Value);
             }
 
             // write
