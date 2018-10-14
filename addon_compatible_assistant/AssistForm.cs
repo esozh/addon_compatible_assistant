@@ -80,6 +80,8 @@ namespace addon_compatible_assistant
                 { "MiniMap/Fonts/fontin_sans_i.otf", "EsoZH/fonts/univers57.otf" },
                 { "MiniMap/Fonts/fontin_sans_r.otf", "EsoZH/fonts/univers57.otf" },
                 { "MiniMap/Fonts/fontin_sans_sc.otf", "EsoZH/fonts/univers57.otf" },
+                { "/BanditsUserInterface/fonts/univers57.otf", "EsoZH/fonts/univers57.otf" },
+                { "/BanditsUserInterface/fonts/univers67.otf", "EsoZH/fonts/univers57.otf" },
             };
         }
 
